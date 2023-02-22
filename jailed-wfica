@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+PATH="$PATH:@citrix@/bin"
+NAME=$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}")
+
+set -u
+
+shutdown_active() {
+	firejail --list |
+		awk -F: "/name=$NAME/ {print \$1}" |
+		xargs -i firejail --shutdown={}
+}
+
+trap shutdown_active EXIT
+
+XHOME=$(mktemp --directory)
+create_home() {
+	mkdir --parent "$XHOME"
+	mkdir --parent "$XHOME/.ICAClient"
+	if [ -e "$HOME"/.ICAClient/wfclient.ini ]; then
+		cp --verbose \
+			"$HOME"/.ICAClient/wfclient.ini \
+			"$XHOME"/.ICAClient/wfclient.ini
+	fi
+	touch "$XHOME/.ICAClient/.eula_accepted"
+}
+
+shutdown_active
+create_home
+
+ORIG="${1}"
+COPY="$XHOME/$(basename $ORIG)"
+if [ ! -f "$ORIG" ]; then
+	echo >/dev/stderr "not found: $ORIG"
+	exit 8
+fi
+cp --verbose "$ORIG" "$COPY"
+
+exec firejail \
+	--name="$NAME" \
+	--private="$XHOME" \
+	--restrict-namespaces \
+	--nosound \
+	--novideo \
+	--private-dev \
+	--cpu=0,1 \
+	--machine-id \
+	wfica "$COPY"
