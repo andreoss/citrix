@@ -1,19 +1,21 @@
 {
-  inputs = { nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable"; };
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
   description = "Citrix Client";
-  outputs = { self, nixpkgs }:
-    let
-      systems = lib.systems.flakeExposed;
-      lib = nixpkgs.lib;
-      eachSystem = lib.genAttrs systems;
-    in {
-      legacyPackages = eachSystem (system:
-        import nixpkgs {
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        systems = lib.systems.flakeExposed;
+        lib = nixpkgs.lib;
+        eachSystem = lib.genAttrs systems;
+      in {
+        legacyPackages = import nixpkgs {
           inherit system;
           config = { allowUnfree = true; };
-        });
-      packages.x86_64-linux.default =
-        let pkgs = self.legacyPackages.x86_64-linux;
+        };
+        packages.wfica = let pkgs = self.legacyPackages.${system};
         in pkgs.writeShellApplication {
           name = "wfica";
           checkPhase = ":";
@@ -23,5 +25,6 @@
             citrix = pkgs.citrix_workspace_22_05_0;
           });
         };
-    };
+        defaultPackage = self.packages.${system}.wfica;
+      });
 }
