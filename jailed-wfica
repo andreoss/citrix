@@ -5,14 +5,6 @@ NAME=$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}")
 
 set -u
 
-shutdown_active() {
-	firejail --list |
-		awk -F: "/name=$NAME/ {print \$1}" |
-		xargs -i firejail --shutdown={}
-}
-
-trap shutdown_active EXIT
-
 XHOME=$(mktemp --directory)
 create_home() {
 	mkdir --parent "$XHOME"
@@ -25,7 +17,6 @@ create_home() {
 	touch "$XHOME/.ICAClient/.eula_accepted"
 }
 
-shutdown_active
 create_home
 
 ORIG="${1}"
