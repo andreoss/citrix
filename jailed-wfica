@@ -30,7 +30,6 @@ cp --verbose "$ORIG" "$COPY"
 exec firejail \
 	--name="$NAME" \
 	--private="$XHOME" \
-	--restrict-namespaces \
 	--nosound \
 	--novideo \
 	--private-dev \
