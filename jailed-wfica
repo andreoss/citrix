@@ -27,6 +27,9 @@ if [ ! -f "$ORIG" ]; then
 fi
 cp --verbose "$ORIG" "$COPY"
 
+LC_ALL=en_US.UTF-8
+TZ=America/New_York
+export TZ LC_ALL
 exec firejail \
 	--name="$NAME" \
 	--private="$XHOME" \
