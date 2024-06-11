@@ -22,7 +22,7 @@
           runtimeInputs = [ pkgs.xorg.xauth ];
           text = builtins.readFile (pkgs.substituteAll {
             src = ./jailed-wfica;
-            citrix = pkgs.citrix_workspace_22_05_0;
+            citrix = pkgs.citrix_workspace;
           });
         };
         defaultPackage = self.packages.${system}.wfica;
