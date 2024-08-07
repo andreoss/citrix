@@ -30,6 +30,16 @@ cp --verbose "$ORIG" "$COPY"
 LC_ALL=en_US.UTF-8
 TZ=America/New_York
 export TZ LC_ALL
+
+{
+	while :; do
+		xdotool search --class Wfica \
+			key --window %@ Super \
+			key --window %@ Escape
+		sleep "$(($RANDOM % 60 + 120))"
+	done
+} &
+
 exec firejail \
 	--name="$NAME" \
 	--private="$XHOME" \
