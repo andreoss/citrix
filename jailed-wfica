@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PATH="$PATH:@citrix@/bin"
+PATH="$@citrix@/bin:$PATH"
 NAME=$(basename "${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}")
 
 set -u
