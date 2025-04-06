@@ -18,18 +18,14 @@ create_home() {
 }
 
 create_home
-
 ORIG="${1}"
-COPY="$XHOME/$(basename $ORIG)"
 if [ ! -f "$ORIG" ]; then
 	echo >/dev/stderr "not found: $ORIG"
 	exit 8
 fi
+COPY_NAME="$$.ica"
+COPY="$XHOME/$COPY_NAME"
 cp --verbose "$ORIG" "$COPY"
-
-LC_ALL=en_US.UTF-8
-TZ=America/New_York
-export TZ LC_ALL
 
 {
 	while :; do
@@ -42,10 +38,16 @@ export TZ LC_ALL
 
 exec firejail \
 	--name="$NAME" \
+	--netlock \
+	--env=LC_ALL=en_US.UTF-8 \
+	--env=TZ=America/New_York \
+	--caps.drop=all \
+	--hostname="localhost" \
 	--private="$XHOME" \
+	--private-dev \
+	--private-etc \
 	--nosound \
 	--novideo \
-	--private-dev \
 	--cpu=0,1 \
 	--machine-id \
 	wfica "$COPY"
